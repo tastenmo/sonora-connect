@@ -8,6 +8,7 @@ from concurrent import futures
 import bjoern
 import grpc
 import pytest
+import pytest_asyncio
 import uvicorn
 from google.protobuf import empty_pb2
 
@@ -344,7 +345,7 @@ wsgi_greeter = pytest.fixture(
         helloworld_pb2_grpc.GreeterStub,
     )
 )
-asgi_greeter = pytest.fixture(
+asgi_greeter = pytest_asyncio.fixture(
     _async_channel_fixture(
         _asgi_helloworld_server,
         sonora.aio.insecure_web_channel,
@@ -352,7 +353,7 @@ asgi_greeter = pytest.fixture(
     )
 )
 
-asgi_benchmark = pytest.fixture(
+asgi_benchmark = pytest_asyncio.fixture(
     _async_channel_fixture(
         _asgi_benchmark_server,
         sonora.aio.insecure_web_channel,

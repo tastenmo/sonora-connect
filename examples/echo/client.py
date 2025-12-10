@@ -16,9 +16,12 @@ with sonora.client.insecure_web_channel("http://localhost:8888") as c:
     ):
         print(r)
 
-    for r in x.ServerStreamingEchoAbort(
-        echo_pb2.ServerStreamingEchoRequest(
-            message="honk", message_count=10, message_interval=d
-        )
-    ):
-        print(r)
+    try:
+        for r in x.ServerStreamingEchoAbort(
+            echo_pb2.ServerStreamingEchoRequest(
+                message="honk", message_count=10, message_interval=d
+            )
+        ):
+            print(r)
+    except Exception as e:
+        print(f"caught expected error: {e}")

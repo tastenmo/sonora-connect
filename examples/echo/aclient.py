@@ -2,6 +2,7 @@ import asyncio
 
 from google.protobuf.duration_pb2 import Duration
 import sonora.aio
+import sonora.protocol
 import echo_pb2_grpc, echo_pb2
 
 
@@ -21,13 +22,16 @@ async def example():
             async for r in call:
                 print(r)
 
-        with x.ServerStreamingEchoAbort(
-            echo_pb2.ServerStreamingEchoRequest(
-                message="honk", message_count=10, message_interval=d
-            )
-        ) as call:
-            async for r in call:
-                print(r)
+        try:
+            with x.ServerStreamingEchoAbort(
+                echo_pb2.ServerStreamingEchoRequest(
+                    message="honk", message_count=10, message_interval=d
+                )
+            ) as call:
+                async for r in call:
+                    print(r)
+        except sonora.protocol.WebRpcError as e:
+            print(f"Caught expected error: {e}")
 
 
 asyncio.run(example())

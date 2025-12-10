@@ -69,7 +69,9 @@ class WebChannel:
     def __await__(self):
         yield self
 
-    def unary_unary(self, path, request_serializer, response_deserializer):
+    def unary_unary(
+        self, path, request_serializer, response_deserializer, _registered_method=True
+    ):
         return UnaryUnaryMulticallable(
             self._session,
             self._url,
@@ -81,7 +83,9 @@ class WebChannel:
             self._compression,
         )
 
-    def unary_stream(self, path, request_serializer, response_deserializer):
+    def unary_stream(
+        self, path, request_serializer, response_deserializer, _registered_method=True
+    ):
         return UnaryStreamMulticallable(
             self._session,
             self._url,
@@ -93,7 +97,9 @@ class WebChannel:
             self._compression,
         )
 
-    def stream_unary(self, path, request_serializer, response_deserializer):
+    def stream_unary(
+        self, path, request_serializer, response_deserializer, _registered_method=True
+    ):
         return StreamUnaryMulticallable(
             self._session,
             self._url,
@@ -105,7 +111,9 @@ class WebChannel:
             self._compression,
         )
 
-    def stream_stream(self, path, request_serializer, response_deserializer):
+    def stream_stream(
+        self, path, request_serializer, response_deserializer, _registered_method=True
+    ):
         return StreamStreamMulticallable(
             self._session,
             self._url,

@@ -66,7 +66,9 @@ class WebChannel:
     def __exit__(self, exception_type, exception_value, traceback):
         self._session.clear()
 
-    def unary_unary(self, path, request_serializer, response_deserializer):
+    def unary_unary(
+        self, path, request_serializer, response_deserializer, _registered_method=True
+    ):
         return UnaryUnaryMulticallable(
             self._session,
             self._url,
@@ -78,7 +80,9 @@ class WebChannel:
             self._compression,
         )
 
-    def unary_stream(self, path, request_serializer, response_deserializer):
+    def unary_stream(
+        self, path, request_serializer, response_deserializer, _registered_method=True
+    ):
         return UnaryStreamMulticallable(
             self._session,
             self._url,
@@ -90,7 +94,9 @@ class WebChannel:
             self._compression,
         )
 
-    def stream_unary(self, path, request_serializer, response_deserializer):
+    def stream_unary(
+        self, path, request_serializer, response_deserializer, _registered_method=True
+    ):
         return StreamUnaryMulticallable(
             self._session,
             self._url,
@@ -102,7 +108,9 @@ class WebChannel:
             self._compression,
         )
 
-    def stream_stream(self, path, request_serializer, response_deserializer):
+    def stream_stream(
+        self, path, request_serializer, response_deserializer, _registered_method=True
+    ):
         return StreamStreamMulticallable(
             self._session,
             self._url,
@@ -290,7 +298,7 @@ class StreamStreamMulticallable(Multicallable):
 class Call:
     response_streaming: bool
     request_streaming: bool
-    _response: typing.Optional[urllib3.HTTPResponse]
+    _response: typing.Any
 
     def __init__(
         self,
