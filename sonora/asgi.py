@@ -65,7 +65,7 @@ class grpcASGI(grpc.Server):
                             rpc_method, context, receive, send, codec
                         )
                 except asyncio.TimeoutError:
-                    context.code = grpc.StatusCode.DEADLINE_EXCEEDED
+                    context.set_code(grpc.StatusCode.DEADLINE_EXCEEDED)
                     context.details = "request timed out at the server"
                     await self._do_grpc_error(send, codec, context)
 
@@ -269,7 +269,7 @@ class grpcASGI(grpc.Server):
                 else:
                     recv_task.cancel()
 
-        codec.set_code(context.code)
+        codec.set_code(context.code())
         if context.details:
             codec.set_details(context.details)
 
@@ -292,7 +292,7 @@ class grpcASGI(grpc.Server):
             except grpc.RpcError:
                 message = None
 
-        codec.set_code(context.code)
+        codec.set_code(context.code())
         if context.details:
             codec.set_details(context.details)
 
@@ -310,7 +310,7 @@ class grpcASGI(grpc.Server):
     async def _do_grpc_error(self, send, codec: Codec, context):
         headers = context._response_headers
 
-        codec.set_code(context.code)
+        codec.set_code(context.code())
         codec.set_details(context.details)
         if context._initial_metadata:
             codec.set_initial_metadata(context._initial_metadata)
@@ -361,7 +361,7 @@ class grpcASGI(grpc.Server):
 
 class ServicerContext(grpc.aio.ServicerContext):
     def __init__(self, timeout=None, metadata=None, enable_cors=True):
-        self.code = grpc.StatusCode.OK
+        self._code = grpc.StatusCode.OK
         self.details = None
 
         self._timeout = timeout
@@ -396,14 +396,20 @@ class ServicerContext(grpc.aio.ServicerContext):
                 (b"Access-Control-Expose-Headers", b"*"),
             ]
 
+    def code(self):
+        return self._code
+
+    def trailing_metadata(self):
+        return self._trailing_metadata or Metadata([])
+
     def set_code(self, code):
         if isinstance(code, grpc.StatusCode):
-            self.code = code
+            self._code = code
 
         elif isinstance(code, int):
             for status_code in grpc.StatusCode:
                 if status_code.value[0] == code:
-                    self.code = status_code
+                    self._code = status_code
                     break
             else:
                 raise ValueError(f"Unknown StatusCode: {code}")
